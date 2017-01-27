@@ -1,16 +1,21 @@
 <VirtualHost 0.0.0.0:8080>
-    ServerName http://catalogo.datos.gob.mx.dev
-    ServerAlias http://catalogo.datos.gob.mx.dev
-    WSGIScriptAlias / /etc/ckan/default/apache.wsgi
+  ServerName ckan
+  ServerAlias *
+  WSGIScriptAlias /busca /etc/ckan/apache.wsgi
 
-    # Pass authorization info on (needed for rest api).
-    WSGIPassAuthorization On
+  # Pass authorization info on (needed for rest api).
+  WSGIPassAuthorization On
 
-    # Deploy as a daemon (avoids conflicts between CKAN instances).
-    WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+  # Deploy as a daemon (avoids conflicts between CKAN instances).
+  WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+  WSGIProcessGroup ckan_default
 
-    WSGIProcessGroup ckan_default
+  ErrorLog |/bin/cat
+  Header set Access-Control-Allow-Origin "*"
 
-    ErrorLog /var/log/apache2/ckan_default.error.log
-    CustomLog /var/log/apache2/ckan_default.custom.log combined
+  <Directory /etc/ckan/ >
+      Order deny,allow
+      Allow from all
+      Require all granted
+  </Directory>
 </VirtualHost>
