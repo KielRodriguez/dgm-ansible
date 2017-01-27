@@ -14,16 +14,19 @@
   copy: src=apache.wsgi dest=/etc/ckan/default/apache.wsgi force=yes mode=0644 
   
 - name: Copy Apache configuration file
-  copy: src=ckan_default dest=/etc/apache2/sites-available/ckan_default force=yes
+  copy: src=ckan_default.conf dest=/etc/apache2/sites-available/ckan_default.conf force=yes
 
 - name: Copy Nginx configuration file
   copy: src=ckan_default_nginx dest=/etc/nginx/sites-available/ckan_default force=yes
 
 - name: Enable CKAN apache
-  command: a2ensite ckan_default
+  command: a2ensite ckan_default.conf
 
 - name: Enable CKAN nginx
   file: src=/etc/nginx/sites-available/ckan_default dest=/etc/nginx/sites-enabled/ckan_default state=link force=yes 
+
+- name: Install comand headers
+  command: a2enmod headers
 
 - name: Reload Apache2
   service: name=apache2 state=reloaded
