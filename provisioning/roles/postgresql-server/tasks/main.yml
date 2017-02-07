@@ -36,11 +36,17 @@
   always_run: yes
   sudo: true
 
-- name: Add PostgreSQL iptable rule
-  command: iptables -A INPUT -p tcp -s 0/0 --sport 1024:65535 -d {{ db.ip }} --dport {{ db.pg.port }} -m state --state NEW,ESTABLISHED -j ACCEPT -m comment --comment "postgresql"
+- name: Add PostgreSQL iptable rule OUTPUT
   command: iptables -A OUTPUT -p tcp -s {{ db.ip }} --sport {{ db.pg.port }} -d 0/0 --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT -m comment --comment "postgresql"
   sudo: true
   when: iptablesrules.stdout.find("postgresql") == -1
+
+- name: Add PostgreSQL iptable rule INPUT
+  command: iptables -A INPUT -p tcp -s 0/0 --sport 1024:65535 -d {{ db.ip }} --dport {{ db.pg.port }} -m state --state NEW,ESTABLISHED -j ACCEPT -m comment --comment "postgresql"
+  sudo: true
+  when: iptablesrules.stdout.find("postgresql") == -1
+
+
 
 - name: save iptables
   command: iptables-save
